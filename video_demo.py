@@ -6,9 +6,9 @@ import torchvision.transforms as transforms
 import torch.nn as nn
 import torch.utils.data
 import numpy as np
-from opt import opt
+from AlphaPose.opt import opt
 
-from dataloader import VideoLoader, DetectionLoader, DetectionProcessor, DataWriter, Mscoco
+from AlphaPose.dataloader import VideoLoader, DetectionLoader, DetectionProcessor, DataWriter, Mscoco
 from yolo.util import write_results, dynamic_write_results
 from SPPE.src.main_fast_inference import *
 
@@ -17,10 +17,10 @@ import os
 import sys
 from tqdm import tqdm
 import time
-from fn import getTime
+from AlphaPose.fn import getTime
 import cv2
 
-from pPose_nms import pose_nms, write_json
+from AlphaPose.pPose_nms import pose_nms, write_json
 
 args = opt
 args.dataset = 'coco'
@@ -33,7 +33,7 @@ if __name__ == "__main__":
     mode = args.mode
     if not os.path.exists(args.outputpath):
         os.mkdir(args.outputpath)
-    
+
     if not len(videofile):
         raise IOError('Error: must contain --video')
 
@@ -46,7 +46,7 @@ if __name__ == "__main__":
     sys.stdout.flush()
     det_loader = DetectionLoader(data_loader, batchSize=args.detbatch).start()
     det_processor = DetectionProcessor(det_loader).start()
-    
+
     # Load pose model
     pose_dataset = Mscoco()
     if args.fast_inference:
@@ -81,7 +81,7 @@ if __name__ == "__main__":
             ckpt_time, det_time = getTime(start_time)
             runtime_profile['dt'].append(det_time)
             # Pose Estimation
-            
+
             datalen = inps.size(0)
             leftover = 0
             if (datalen) % batchSize:
