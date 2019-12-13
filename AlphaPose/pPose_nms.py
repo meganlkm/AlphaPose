@@ -2,8 +2,6 @@
 import torch
 import json
 import os
-import zipfile
-import time
 from multiprocessing.dummy import Pool as ThreadPool
 import numpy as np
 from AlphaPose.opt import opt
@@ -310,55 +308,55 @@ def write_json(all_results, outputpath, for_eval=False, return_json=False):
 
             if form == 'cmu': # the form of CMU-Pose
                 if result['image_id'] not in json_results_cmu.keys():
-                    json_results_cmu[result['image_id']]={}
-                    json_results_cmu[result['image_id']]['version']="AlphaPose v0.2"
-                    json_results_cmu[result['image_id']]['bodies']=[]
-                tmp={'joints':[]}
-                result['keypoints'].append((result['keypoints'][15]+result['keypoints'][18])/2)
-                result['keypoints'].append((result['keypoints'][16]+result['keypoints'][19])/2)
-                result['keypoints'].append((result['keypoints'][17]+result['keypoints'][20])/2)
-                indexarr=[0,51,18,24,30,15,21,27,36,42,48,33,39,45,6,3,12,9]
+                    json_results_cmu[result['image_id']] = {}
+                    json_results_cmu[result['image_id']]['version'] = "AlphaPose v0.2"
+                    json_results_cmu[result['image_id']]['bodies'] = []
+                tmp = {'joints': []}
+                result['keypoints'].append((result['keypoints'][15]+result['keypoints'][18]) / 2)
+                result['keypoints'].append((result['keypoints'][16]+result['keypoints'][19]) / 2)
+                result['keypoints'].append((result['keypoints'][17]+result['keypoints'][20]) / 2)
+                indexarr = [0, 51, 18, 24, 30, 15, 21, 27, 36, 42, 48, 33, 39, 45, 6, 3, 12, 9]
                 for i in indexarr:
                     tmp['joints'].append(result['keypoints'][i])
-                    tmp['joints'].append(result['keypoints'][i+1])
-                    tmp['joints'].append(result['keypoints'][i+2])
+                    tmp['joints'].append(result['keypoints'][i + 1])
+                    tmp['joints'].append(result['keypoints'][i + 2])
                 json_results_cmu[result['image_id']]['bodies'].append(tmp)
             elif form == 'open': # the form of OpenPose
                 if result['image_id'] not in json_results_cmu.keys():
                     json_results_cmu[result['image_id']]={}
-                    json_results_cmu[result['image_id']]['version']="AlphaPose v0.2"
-                    json_results_cmu[result['image_id']]['people']=[]
-                tmp={'pose_keypoints_2d':[]}
-                result['keypoints'].append((result['keypoints'][15]+result['keypoints'][18])/2)
-                result['keypoints'].append((result['keypoints'][16]+result['keypoints'][19])/2)
-                result['keypoints'].append((result['keypoints'][17]+result['keypoints'][20])/2)
-                indexarr=[0,51,18,24,30,15,21,27,36,42,48,33,39,45,6,3,12,9]
+                    json_results_cmu[result['image_id']]['version'] = "AlphaPose v0.2"
+                    json_results_cmu[result['image_id']]['people'] = []
+                tmp = {'pose_keypoints_2d': []}
+                result['keypoints'].append((result['keypoints'][15] + result['keypoints'][18]) / 2)
+                result['keypoints'].append((result['keypoints'][16] + result['keypoints'][19]) / 2)
+                result['keypoints'].append((result['keypoints'][17] + result['keypoints'][20]) / 2)
+                indexarr = [0, 51, 18, 24, 30, 15, 21, 27, 36, 42, 48, 33, 39, 45, 6, 3, 12, 9]
                 for i in indexarr:
                     tmp['pose_keypoints_2d'].append(result['keypoints'][i])
-                    tmp['pose_keypoints_2d'].append(result['keypoints'][i+1])
-                    tmp['pose_keypoints_2d'].append(result['keypoints'][i+2])
+                    tmp['pose_keypoints_2d'].append(result['keypoints'][i + 1])
+                    tmp['pose_keypoints_2d'].append(result['keypoints'][i + 2])
                 json_results_cmu[result['image_id']]['people'].append(tmp)
             else:
                 json_results.append(result)
 
     if form == 'cmu': # the form of CMU-Pose
-        with open(os.path.join(outputpath,'alphapose-results.json'), 'w') as json_file:
+        with open(os.path.join(outputpath, 'alphapose-results.json'), 'w') as json_file:
             json_file.write(json.dumps(json_results_cmu))
-            if not os.path.exists(os.path.join(outputpath,'sep-json')):
-                os.mkdir(os.path.join(outputpath,'sep-json'))
+            if not os.path.exists(os.path.join(outputpath, 'sep-json')):
+                os.mkdir(os.path.join(outputpath, 'sep-json'))
             for name in json_results_cmu.keys():
-                with open(os.path.join(outputpath,'sep-json',name.split('.')[0]+'.json'),'w') as json_file:
+                with open(os.path.join(outputpath, 'sep-json', name.split('.')[0] + '.json'), 'w') as json_file:
                     json_file.write(json.dumps(json_results_cmu[name]))
     elif form == 'open': # the form of OpenPose
-        with open(os.path.join(outputpath,'alphapose-results.json'), 'w') as json_file:
+        with open(os.path.join(outputpath, 'alphapose-results.json'), 'w') as json_file:
             json_file.write(json.dumps(json_results_cmu))
-            if not os.path.exists(os.path.join(outputpath,'sep-json')):
-                os.mkdir(os.path.join(outputpath,'sep-json'))
+            if not os.path.exists(os.path.join(outputpath, 'sep-json')):
+                os.mkdir(os.path.join(outputpath, 'sep-json'))
             for name in json_results_cmu.keys():
-                with open(os.path.join(outputpath,'sep-json',name.split('.')[0]+'.json'),'w') as json_file:
+                with open(os.path.join(outputpath, 'sep-json', name.split('.')[0] + '.json'), 'w') as json_file:
                     json_file.write(json.dumps(json_results_cmu[name]))
     else:
-        with open(os.path.join(outputpath,'alphapose-results.json'), 'w') as json_file:
+        with open(os.path.join(outputpath, 'alphapose-results.json'), 'w') as json_file:
             json_file.write(json.dumps(json_results))
 
     if return_json:

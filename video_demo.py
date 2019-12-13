@@ -1,26 +1,20 @@
 import torch
-from torch.autograd import Variable
-import torch.nn.functional as F
-import torchvision.transforms as transforms
 
-import torch.nn as nn
 import torch.utils.data
 import numpy as np
 from AlphaPose.opt import opt
 
 from AlphaPose.dataloader import VideoLoader, DetectionLoader, DetectionProcessor, DataWriter, Mscoco
-from yolo.util import write_results, dynamic_write_results
 from SPPE.src.main_fast_inference import *
 
 import ntpath
 import os
 import sys
 from tqdm import tqdm
-import time
 from AlphaPose.fn import getTime
 import cv2
 
-from AlphaPose.pPose_nms import pose_nms, write_json
+from AlphaPose.pPose_nms import write_json
 
 args = opt
 args.dataset = 'coco'
@@ -39,7 +33,7 @@ if __name__ == "__main__":
 
     # Load input video
     data_loader = VideoLoader(videofile, batchSize=args.detbatch).start()
-    (fourcc,fps,frameSize) = data_loader.videoinfo()
+    (fourcc, fps, frameSize) = data_loader.videoinfo()
 
     # Load detection loader
     print('Loading YOLO model..')
@@ -63,10 +57,10 @@ if __name__ == "__main__":
     }
 
     # Data writer
-    save_path = os.path.join(args.outputpath, 'AlphaPose_'+ntpath.basename(videofile).split('.')[0]+'.avi')
+    save_path = os.path.join(args.outputpath, 'AlphaPose_' + ntpath.basename(videofile).split('.')[0] + '.avi')
     writer = DataWriter(args.save_video, save_path, cv2.VideoWriter_fourcc(*'XVID'), fps, frameSize).start()
 
-    im_names_desc =  tqdm(range(data_loader.length()))
+    im_names_desc = tqdm(range(data_loader.length()))
     batchSize = args.posebatch
     for i in im_names_desc:
         start_time = getTime()
@@ -89,7 +83,7 @@ if __name__ == "__main__":
             num_batches = datalen // batchSize + leftover
             hm = []
             for j in range(num_batches):
-                inps_j = inps[j*batchSize:min((j +  1)*batchSize, datalen)].cuda()
+                inps_j = inps[j * batchSize:min((j + 1) * batchSize, datalen)].cuda()
                 hm_j = pose_model(inps_j)
                 hm.append(hm_j)
             hm = torch.cat(hm)
@@ -105,8 +99,8 @@ if __name__ == "__main__":
         if args.profile:
             # TQDM
             im_names_desc.set_description(
-            'det time: {dt:.3f} | pose time: {pt:.2f} | post processing: {pn:.4f}'.format(
-                dt=np.mean(runtime_profile['dt']), pt=np.mean(runtime_profile['pt']), pn=np.mean(runtime_profile['pn']))
+                'det time: {dt:.3f} | pose time: {pt:.2f} | post processing: {pn:.4f}'.format(
+                    dt=np.mean(runtime_profile['dt']), pt=np.mean(runtime_profile['pt']), pn=np.mean(runtime_profile['pn']))
             )
 
     print('===========================> Finish Model Running.')
