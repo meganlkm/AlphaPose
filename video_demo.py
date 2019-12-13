@@ -1,20 +1,19 @@
-import torch
-
-import torch.utils.data
-import numpy as np
-from AlphaPose.opt import opt
-
-from AlphaPose.dataloader import VideoLoader, DetectionLoader, DetectionProcessor, DataWriter, Mscoco
-from SPPE.src.main_fast_inference import *
-
-import ntpath
 import os
 import sys
-from tqdm import tqdm
-from AlphaPose.fn import getTime
-import cv2
 
+import cv2
+import ntpath
+import torch
+import torch.utils.data
+import numpy as np
+from tqdm import tqdm
+
+from AlphaPose.dataloader import VideoLoader, DetectionLoader, DetectionProcessor, DataWriter, Mscoco
+from AlphaPose.fn import getTime
+from AlphaPose.opt import opt
 from AlphaPose.pPose_nms import write_json
+from SPPE.src.main_fast_inference import *
+
 
 args = opt
 args.dataset = 'coco'

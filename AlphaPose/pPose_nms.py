@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
-import torch
-import json
 import os
-from multiprocessing.dummy import Pool as ThreadPool
+import json
+
 import numpy as np
+import torch
+
 from AlphaPose.opt import opt
 
 ''' Constant Configuration '''
@@ -13,9 +14,9 @@ delta2 = 2.65
 gamma = 22.48
 scoreThreds = 0.3
 matchThreds = 5
-areaThres = 0#40 * 40.5
+areaThres = 0 #40 * 40.5
 alpha = 0.1
-#pool = ThreadPool(4)
+# pool = ThreadPool(4)
 
 
 def pose_nms(bboxes, bbox_scores, pose_preds, pose_scores):
@@ -26,7 +27,7 @@ def pose_nms(bboxes, bbox_scores, pose_preds, pose_scores):
     pose_preds:     pose locations list (n, 17, 2)
     pose_scores:    pose scores list    (n, 17, 1)
     '''
-    #global ori_pose_preds, ori_pose_scores, ref_dists
+    # global ori_pose_preds, ori_pose_scores, ref_dists
 
     pose_scores[pose_scores == 0] = 1e-5
 
@@ -68,8 +69,8 @@ def pose_nms(bboxes, bbox_scores, pose_preds, pose_scores):
 
         if delete_ids.shape[0] == 0:
             delete_ids = pick_id
-        #else:
-        #    delete_ids = torch.from_numpy(delete_ids)
+        # else:
+        #     delete_ids = torch.from_numpy(delete_ids)
 
         merge_ids.append(human_ids[delete_ids])
         pose_preds = np.delete(pose_preds, delete_ids, axis=0)
@@ -82,8 +83,8 @@ def pose_nms(bboxes, bbox_scores, pose_preds, pose_scores):
     preds_pick = ori_pose_preds[pick]
     scores_pick = ori_pose_scores[pick]
     bbox_scores_pick = ori_bbox_scores[pick]
-    #final_result = pool.map(filter_result, zip(scores_pick, merge_ids, preds_pick, pick, bbox_scores_pick))
-    #final_result = [item for item in final_result if item is not None]
+    # final_result = pool.map(filter_result, zip(scores_pick, merge_ids, preds_pick, pick, bbox_scores_pick))
+    # final_result = [item for item in final_result if item is not None]
 
     for j in range(len(pick)):
         ids = np.arange(17)
@@ -312,9 +313,9 @@ def write_json(all_results, outputpath, for_eval=False, return_json=False):
                     json_results_cmu[result['image_id']]['version'] = "AlphaPose v0.2"
                     json_results_cmu[result['image_id']]['bodies'] = []
                 tmp = {'joints': []}
-                result['keypoints'].append((result['keypoints'][15]+result['keypoints'][18]) / 2)
-                result['keypoints'].append((result['keypoints'][16]+result['keypoints'][19]) / 2)
-                result['keypoints'].append((result['keypoints'][17]+result['keypoints'][20]) / 2)
+                result['keypoints'].append((result['keypoints'][15] + result['keypoints'][18]) / 2)
+                result['keypoints'].append((result['keypoints'][16] + result['keypoints'][19]) / 2)
+                result['keypoints'].append((result['keypoints'][17] + result['keypoints'][20]) / 2)
                 indexarr = [0, 51, 18, 24, 30, 15, 21, 27, 36, 42, 48, 33, 39, 45, 6, 3, 12, 9]
                 for i in indexarr:
                     tmp['joints'].append(result['keypoints'][i])
@@ -323,7 +324,7 @@ def write_json(all_results, outputpath, for_eval=False, return_json=False):
                 json_results_cmu[result['image_id']]['bodies'].append(tmp)
             elif form == 'open': # the form of OpenPose
                 if result['image_id'] not in json_results_cmu.keys():
-                    json_results_cmu[result['image_id']]={}
+                    json_results_cmu[result['image_id']] = {}
                     json_results_cmu[result['image_id']]['version'] = "AlphaPose v0.2"
                     json_results_cmu[result['image_id']]['people'] = []
                 tmp = {'pose_keypoints_2d': []}
