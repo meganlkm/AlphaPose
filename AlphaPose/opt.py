@@ -1,5 +1,4 @@
 import argparse
-import torch
 
 parser = argparse.ArgumentParser(description='PyTorch AlphaPose Training')
 

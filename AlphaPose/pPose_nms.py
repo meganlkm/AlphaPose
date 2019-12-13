@@ -14,7 +14,7 @@ delta2 = 2.65
 gamma = 22.48
 scoreThreds = 0.3
 matchThreds = 5
-areaThres = 0 #40 * 40.5
+areaThres = 0 # 40 * 40.5
 alpha = 0.1
 # pool = ThreadPool(4)
 
@@ -274,8 +274,43 @@ def PCK_match(pick_pred, all_preds, ref_dist):
         dist / ref_dist <= 1,
         dim=1
     )
-
     return num_match_keypoints
+
+
+def generate_json(all_results, outputpath=None, for_eval=False):
+    '''
+    all_result: result dict of predictions
+    outputpath: optional. save json file here
+    '''
+    json_results = []
+    for im_res in all_results:
+        im_name = im_res['imgname']
+        for human in im_res['result']:
+            keypoints = []
+            result = {}
+            if for_eval:
+                result['image_id'] = int(im_name.split('/')[-1].split('.')[0].split('_')[-1])
+            else:
+                result['image_id'] = im_name.split('/')[-1]
+            result['category_id'] = 1
+
+            kp_preds = human['keypoints']
+            kp_scores = human['kp_score']
+            pro_scores = human['proposal_score']
+            for n in range(kp_scores.shape[0]):
+                keypoints.append(float(kp_preds[n, 0]))
+                keypoints.append(float(kp_preds[n, 1]))
+                keypoints.append(float(kp_scores[n]))
+            result['keypoints'] = keypoints
+            result['score'] = float(pro_scores)
+
+            json_results.append(result)
+
+    if outputpath:
+        with open(os.path.join(outputpath, 'alphapose-results.json'), 'w') as json_file:
+            json_file.write(json.dumps(json_results))
+
+    return json_results
 
 
 def write_json(all_results, outputpath, for_eval=False, return_json=False):

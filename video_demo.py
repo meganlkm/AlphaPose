@@ -12,11 +12,13 @@ from AlphaPose.dataloader import VideoLoader, DetectionLoader, DetectionProcesso
 from AlphaPose.fn import getTime
 from AlphaPose.opt import opt
 from AlphaPose.pPose_nms import write_json
+# from AlphaPose.pPose_nms import generate_json
 from SPPE.src.main_fast_inference import *
 
 
 args = opt
 args.dataset = 'coco'
+
 if not args.sp:
     torch.multiprocessing.set_start_method('forkserver', force=True)
     torch.multiprocessing.set_sharing_strategy('file_system')
@@ -111,3 +113,5 @@ if __name__ == "__main__":
     writer.stop()
     final_result = writer.results()
     write_json(final_result, args.outputpath)
+    # output = generate_json(final_result)
+    # print(output)
