@@ -306,10 +306,6 @@ def generate_json(all_results, outputpath=None, for_eval=False):
 
             json_results.append(result)
 
-    if outputpath:
-        with open(os.path.join(outputpath, 'alphapose-results.json'), 'w') as json_file:
-            json_file.write(json.dumps(json_results))
-
     return json_results
 
 
