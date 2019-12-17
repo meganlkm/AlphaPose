@@ -13,7 +13,7 @@ from AlphaPose.dataloader import VideoLoader, DetectionLoader, DetectionProcesso
 from AlphaPose.fn import getTime
 from AlphaPose.opt import opt
 from AlphaPose.pPose_nms import generate_json
-from SPPE.src.main_fast_inference import *
+from SPPE.src.main_fast_inference import InferenNet_fast
 
 
 args = opt

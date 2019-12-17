@@ -1,20 +1,15 @@
 import logging
+import sys
 
 import torch
 import torch.nn as nn
 import torch.utils.data
 import torch.utils.data.distributed
-import torch.nn.functional as F
-import numpy as np
+import torch._utils
+
 from SPPE.src.utils.img import flip, shuffleLR
-from SPPE.src.utils.eval import getPrediction
 from SPPE.src.models.FastPose import createModel
 
-import visdom
-import time
-import sys
-
-import torch._utils
 try:
     torch._utils._rebuild_tensor_v2
 except AttributeError:
@@ -46,8 +41,7 @@ class InferenNet(nn.Module):
         flip_out = self.pyranet(flip(x))
         flip_out = flip_out.narrow(1, 0, 17)
 
-        flip_out = flip(shuffleLR(
-            flip_out, self.dataset))
+        flip_out = flip(shuffleLR(flip_out, self.dataset))
 
         out = (flip_out + out) / 2
 
