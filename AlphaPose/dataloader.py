@@ -1,27 +1,27 @@
 import os
-import torch
-from torch.autograd import Variable
-import torch.utils.data as data
-import torchvision.transforms as transforms
-from PIL import Image, ImageDraw
-from SPPE.src.utils.img import load_image, cropBox, im_to_torch
-from AlphaPose.opt import opt
-from yolo.preprocess import prep_image, prep_frame, inp_to_image
-from AlphaPose.pPose_nms import pose_nms, write_json
-from AlphaPose.matching import candidate_reselect as matching
-from SPPE.src.utils.eval import getPrediction, getMultiPeakPrediction
-from yolo.util import write_results, dynamic_write_results
-from yolo.darknet import Darknet
-from tqdm import tqdm
-import cv2
-import json
-import numpy as np
 import sys
 import time
-import torch.multiprocessing as mp
-from multiprocessing import Process
 from multiprocessing import Queue as pQueue
 from threading import Thread
+
+import cv2
+import numpy as np
+import torch
+import torch.multiprocessing as mp
+import torchvision.transforms as transforms
+import torch.utils.data as data
+from PIL import Image
+from torch.autograd import Variable
+
+from AlphaPose.matching import candidate_reselect as matching
+from AlphaPose.opt import opt
+from AlphaPose.pPose_nms import pose_nms
+from SPPE.src.utils.eval import getPrediction, getMultiPeakPrediction
+from SPPE.src.utils.img import load_image, cropBox, im_to_torch
+from yolo.preprocess import prep_image, prep_frame
+from yolo.darknet import Darknet
+from yolo.util import dynamic_write_results
+
 # import the Queue class from Python 3
 if sys.version_info >= (3, 0):
     from queue import Queue, LifoQueue

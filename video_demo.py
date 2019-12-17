@@ -113,5 +113,7 @@ if __name__ == "__main__":
     writer.stop()
     final_result = writer.results()
     write_json(final_result, args.outputpath)
+
+    # create the json without writing it to a file
     # output = generate_json(final_result)
     # print(output)
