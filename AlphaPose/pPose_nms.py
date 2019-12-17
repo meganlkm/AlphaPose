@@ -277,7 +277,7 @@ def PCK_match(pick_pred, all_preds, ref_dist):
     return num_match_keypoints
 
 
-def generate_json(all_results, outputpath=None, for_eval=False):
+def generate_json(all_results, for_eval=False):
     '''
     all_result: result dict of predictions
     outputpath: optional. save json file here
