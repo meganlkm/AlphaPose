@@ -1,8 +1,9 @@
+# python process_video.py --video <path to video>
+import json
 import os
 import sys
 
 import cv2
-import ntpath
 import torch
 import torch.utils.data
 import numpy as np
@@ -11,9 +12,8 @@ from tqdm import tqdm
 from AlphaPose.dataloader import VideoLoader, DetectionLoader, DetectionProcessor, DataWriter, Mscoco
 from AlphaPose.fn import getTime
 from AlphaPose.opt import opt
-from AlphaPose.pPose_nms import write_json
-# from AlphaPose.pPose_nms import generate_json
-from SPPE.src.main_fast_inference import *
+from AlphaPose.pPose_nms import generate_json
+from SPPE.src.main_fast_inference import InferenNet_fast
 
 
 args = opt
@@ -37,17 +37,13 @@ if __name__ == "__main__":
     (fourcc, fps, frameSize) = data_loader.videoinfo()
 
     # Load detection loader
-    print('Loading YOLO model..')
     sys.stdout.flush()
     det_loader = DetectionLoader(data_loader, batchSize=args.detbatch).start()
     det_processor = DetectionProcessor(det_loader).start()
 
     # Load pose model
     pose_dataset = Mscoco()
-    if args.fast_inference:
-        pose_model = InferenNet_fast(4 * 1 + 1, pose_dataset)
-    else:
-        pose_model = InferenNet(4 * 1 + 1, pose_dataset)
+    pose_model = InferenNet_fast(4 * 1 + 1, pose_dataset)
     pose_model.cuda()
     pose_model.eval()
 
@@ -58,8 +54,7 @@ if __name__ == "__main__":
     }
 
     # Data writer
-    save_path = os.path.join(args.outputpath, 'AlphaPose_' + ntpath.basename(videofile).split('.')[0] + '.avi')
-    writer = DataWriter(args.save_video, save_path, cv2.VideoWriter_fourcc(*'XVID'), fps, frameSize).start()
+    writer = DataWriter(False, None, cv2.VideoWriter_fourcc(*'XVID'), fps, frameSize).start()
 
     im_names_desc = tqdm(range(data_loader.length()))
     batchSize = args.posebatch
@@ -104,16 +99,14 @@ if __name__ == "__main__":
                     dt=np.mean(runtime_profile['dt']), pt=np.mean(runtime_profile['pt']), pn=np.mean(runtime_profile['pn']))
             )
 
-    print('===========================> Finish Model Running.')
-    if (args.save_img or args.save_video) and not args.vis_fast:
-        print('===========================> Rendering remaining images in the queue...')
-        print('===========================> If this step takes too long, you can enable the --vis_fast flag to use fast rendering (real-time).')
     while(writer.running()):
         pass
     writer.stop()
+
     final_result = writer.results()
-    write_json(final_result, args.outputpath)
 
     # create the json without writing it to a file
-    # output = generate_json(final_result)
-    # print(output)
+    output = generate_json(final_result)
+    # write it to compare results
+    with open('tmp/res/alphapose-results.json', 'w') as json_file:
+        json_file.write(json.dumps(output))

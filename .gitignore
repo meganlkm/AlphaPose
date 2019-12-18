@@ -20,6 +20,8 @@ images
 */.ipynb_checkpoints/
 */.tensorboard/*
 */exp
+.venv
+*.egg-info
 
 *.pth
 *.h5
@@ -28,3 +30,4 @@ images
 
 coco-minival/
 tmp/
+get-models.py
