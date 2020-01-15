@@ -278,10 +278,9 @@ def PCK_match(pick_pred, all_preds, ref_dist):
 
 
 def generate_json(all_results, for_eval=False):
-    '''
+    """
     all_result: result dict of predictions
-    outputpath: optional. save json file here
-    '''
+    """
     json_results = []
     for im_res in all_results:
         im_name = im_res['imgname']
@@ -307,6 +306,50 @@ def generate_json(all_results, for_eval=False):
             json_results.append(result)
 
     return json_results
+
+
+def generate_cmu_json(all_results, for_eval=False):
+    """
+    all_result: result dict of predictions
+    """
+    json_results_cmu = {}
+    for im_res in all_results:
+        im_name = im_res['imgname']
+        for human in im_res['result']:
+            keypoints = []
+            result = {}
+            if for_eval:
+                result['image_id'] = int(im_name.split('/')[-1].split('.')[0].split('_')[-1])
+            else:
+                result['image_id'] = im_name.split('/')[-1]
+            result['category_id'] = 1
+
+            kp_preds = human['keypoints']
+            kp_scores = human['kp_score']
+            pro_scores = human['proposal_score']
+            for n in range(kp_scores.shape[0]):
+                keypoints.append(float(kp_preds[n, 0]))
+                keypoints.append(float(kp_preds[n, 1]))
+                keypoints.append(float(kp_scores[n]))
+            result['keypoints'] = keypoints
+            result['score'] = float(pro_scores)
+
+            if result['image_id'] not in json_results_cmu.keys():
+                json_results_cmu[result['image_id']] = {}
+                json_results_cmu[result['image_id']]['version'] = "AlphaPose v0.2"
+                json_results_cmu[result['image_id']]['bodies'] = []
+            tmp = {'joints': []}
+            result['keypoints'].append((result['keypoints'][15] + result['keypoints'][18]) / 2)
+            result['keypoints'].append((result['keypoints'][16] + result['keypoints'][19]) / 2)
+            result['keypoints'].append((result['keypoints'][17] + result['keypoints'][20]) / 2)
+            indexarr = [0, 51, 18, 24, 30, 15, 21, 27, 36, 42, 48, 33, 39, 45, 6, 3, 12, 9]
+            for i in indexarr:
+                tmp['joints'].append(result['keypoints'][i])
+                tmp['joints'].append(result['keypoints'][i + 1])
+                tmp['joints'].append(result['keypoints'][i + 2])
+            json_results_cmu[result['image_id']]['bodies'].append(tmp)
+
+    return json_results_cmu
 
 
 def write_json(all_results, outputpath, for_eval=False, return_json=False):

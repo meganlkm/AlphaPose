@@ -1,3 +1,4 @@
+# import json
 import os
 import sys
 
@@ -13,6 +14,7 @@ from AlphaPose.fn import getTime
 from AlphaPose.opt import opt
 from AlphaPose.pPose_nms import write_json
 # from AlphaPose.pPose_nms import generate_json
+# from AlphaPose.pPose_nms import generate_cmu_json
 from SPPE.src.main_fast_inference import *
 
 
@@ -113,6 +115,11 @@ if __name__ == "__main__":
     writer.stop()
     final_result = writer.results()
     write_json(final_result, args.outputpath)
+
+    # create the cmu json without writing it to a file
+    # output = generate_cmu_json(final_result)
+    # with open("cmu-output.json", "w") as fh:
+    #     json.dump(output, fh)
 
     # create the json without writing it to a file
     # output = generate_json(final_result)
